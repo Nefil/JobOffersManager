@@ -34,7 +34,10 @@ public class JobsController : ControllerBase
         {
             Id = _nextId++,
             Title = dto.Title,
-            Seniority = dto.Seniority
+            Seniority = dto.Seniority,
+            Description = dto.Description,
+            Requirements = dto.Requirements,
+            Created = DateTime.UtcNow
         };
 
         _jobs.Add(job);
