@@ -27,6 +27,34 @@ public class JobsController : ControllerBase
         return Ok(job);
     }
 
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, UpdateJobOfferDto dto)
+    {
+        var job = _jobs.FirstOrDefault(j => j.Id == id);
+
+        if (job == null)
+            return NotFound();
+
+        job.Title = dto.Title;
+        job.Seniority = dto.Seniority;
+        job.Description = dto.Description;
+        job.Requirements = dto.Requirements;
+
+        return Ok(job);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        var job = _jobs.FirstOrDefault(j => j.Id == id);
+
+        if (job == null)
+            return NotFound();
+
+        _jobs.Remove(job);
+        return NoContent();
+    }
+
     [HttpPost]
     public IActionResult Create(CreateJobOfferDto dto)
     {

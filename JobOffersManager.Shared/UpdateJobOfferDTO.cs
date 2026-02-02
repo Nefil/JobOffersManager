@@ -2,7 +2,7 @@
 
 namespace JobOffersManager.Shared;
 
-public class CreateJobOfferDto
+public class UpdateJobOfferDto
 {
     [Required]
     [MinLength(3)]
