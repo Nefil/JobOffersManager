@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using JobOffersManager.API.Services;
 using JobOffersManager.Shared;
 
 namespace JobOffersManager.API.Controllers;
@@ -7,69 +8,36 @@ namespace JobOffersManager.API.Controllers;
 [Route("api/jobs")]
 public class JobsController : ControllerBase
 {
-    private static readonly List<JobOfferDto> _jobs = new();
-    private static int _nextId = 1;
+    private readonly IJobOffersService _service;
+
+    public JobsController(IJobOffersService service)
+    {
+        _service = service;
+    }
 
     [HttpGet]
     public IActionResult GetAll()
-    {
-        return Ok(_jobs);
-    }
+        => Ok(_service.GetAll());
 
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
-        var job = _jobs.FirstOrDefault(j => j.Id == id);
-
-        if (job == null)
-            return NotFound();
-
-        return Ok(job);
-    }
-
-    [HttpPut("{id}")]
-    public IActionResult Update(int id, UpdateJobOfferDto dto)
-    {
-        var job = _jobs.FirstOrDefault(j => j.Id == id);
-
-        if (job == null)
-            return NotFound();
-
-        job.Title = dto.Title;
-        job.Seniority = dto.Seniority;
-        job.Description = dto.Description;
-        job.Requirements = dto.Requirements;
-
-        return Ok(job);
-    }
-
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
-    {
-        var job = _jobs.FirstOrDefault(j => j.Id == id);
-
-        if (job == null)
-            return NotFound();
-
-        _jobs.Remove(job);
-        return NoContent();
+        var job = _service.GetById(id);
+        return job == null ? NotFound() : Ok(job);
     }
 
     [HttpPost]
     public IActionResult Create(CreateJobOfferDto dto)
+        => Ok(_service.Create(dto));
+
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, UpdateJobOfferDto dto)
     {
-        var job = new JobOfferDto
-        {
-            Id = _nextId++,
-            Title = dto.Title,
-            Seniority = dto.Seniority,
-            Description = dto.Description,
-            Requirements = dto.Requirements,
-            Created = DateTime.UtcNow
-        };
-
-        _jobs.Add(job);
-
-        return Ok(job);
+        var job = _service.Update(id, dto);
+        return job == null ? NotFound() : Ok(job);
     }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+        => _service.Delete(id) ? NoContent() : NotFound();
 }

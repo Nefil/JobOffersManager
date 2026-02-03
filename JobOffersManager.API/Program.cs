@@ -1,3 +1,4 @@
+using JobOffersManager.API.Services;
 using JobOffersManager.Shared;
 
 namespace JobOffersManager.API
@@ -14,6 +15,9 @@ namespace JobOffersManager.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSingleton<IJobOffersService, JobOffersService>();
+
 
             var app = builder.Build();
 
