@@ -18,7 +18,7 @@ namespace JobOffersManager.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddSingleton<IJobOffersService, JobOffersService>();
+            builder.Services.AddScoped<IJobOffersService, JobOffersService>();
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
