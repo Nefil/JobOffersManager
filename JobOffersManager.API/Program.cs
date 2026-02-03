@@ -1,5 +1,7 @@
 using JobOffersManager.API.Services;
 using JobOffersManager.Shared;
+using JobOffersManager.API.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace JobOffersManager.API
 {
@@ -17,7 +19,8 @@ namespace JobOffersManager.API
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddSingleton<IJobOffersService, JobOffersService>();
-
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 

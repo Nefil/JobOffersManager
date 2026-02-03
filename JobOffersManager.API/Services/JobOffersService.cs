@@ -1,22 +1,33 @@
-﻿using JobOffersManager.Shared;
+﻿using JobOffersManager.API.Data;
+using JobOffersManager.API.Entities;
+using JobOffersManager.Shared;
 
 namespace JobOffersManager.API.Services;
 
 public class JobOffersService : IJobOffersService
 {
-    private static readonly List<JobOfferDto> _jobs = new();
-    private static int _nextId = 1;
+    private readonly AppDbContext _context;
 
-    public List<JobOfferDto> GetAll() => _jobs;
+    public JobOffersService(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public List<JobOfferDto> GetAll()
+        => _context.JobOffers
+            .Select(j => ToDto(j))
+            .ToList();
 
     public JobOfferDto? GetById(int id)
-        => _jobs.FirstOrDefault(j => j.Id == id);
+    {
+        var job = _context.JobOffers.Find(id);
+        return job == null ? null : ToDto(job);
+    }
 
     public JobOfferDto Create(CreateJobOfferDto dto)
     {
-        var job = new JobOfferDto
+        var job = new JobOffer
         {
-            Id = _nextId++,
             Title = dto.Title,
             Seniority = dto.Seniority,
             Description = dto.Description,
@@ -24,13 +35,15 @@ public class JobOffersService : IJobOffersService
             Created = DateTime.UtcNow
         };
 
-        _jobs.Add(job);
-        return job;
+        _context.JobOffers.Add(job);
+        _context.SaveChanges();
+
+        return ToDto(job);
     }
 
     public JobOfferDto? Update(int id, UpdateJobOfferDto dto)
     {
-        var job = GetById(id);
+        var job = _context.JobOffers.Find(id);
         if (job == null) return null;
 
         job.Title = dto.Title;
@@ -38,15 +51,28 @@ public class JobOffersService : IJobOffersService
         job.Description = dto.Description;
         job.Requirements = dto.Requirements;
 
-        return job;
+        _context.SaveChanges();
+        return ToDto(job);
     }
 
     public bool Delete(int id)
     {
-        var job = GetById(id);
+        var job = _context.JobOffers.Find(id);
         if (job == null) return false;
 
-        _jobs.Remove(job);
+        _context.JobOffers.Remove(job);
+        _context.SaveChanges();
         return true;
     }
+
+    private static JobOfferDto ToDto(JobOffer job)
+        => new()
+        {
+            Id = job.Id,
+            Title = job.Title,
+            Seniority = job.Seniority,
+            Description = job.Description,
+            Requirements = job.Requirements,
+            Created = job.Created
+        };
 }
