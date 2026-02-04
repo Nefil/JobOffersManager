@@ -16,8 +16,10 @@ public class JobsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
-        => Ok(_service.GetAll());
+    public IActionResult GetAll([FromQuery] JobOfferQueryDto query)
+    {
+        return Ok(_service.GetAll(query));
+    }
 
     [HttpGet("{id}")]
     public IActionResult GetById(int id)

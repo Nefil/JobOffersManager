@@ -1,6 +1,7 @@
 ﻿using JobOffersManager.API.Data;
 using JobOffersManager.API.Entities;
 using JobOffersManager.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace JobOffersManager.API.Services;
 
@@ -113,6 +114,43 @@ public class JobOffersService : IJobOffersService
                 throw new ArgumentException($"{field.Name} is required");
         }
     }
+
+    // Get all job offers with filtering and pagination
+    public List<JobOfferDto> GetAll(JobOfferQueryDto query)
+    {
+        var jobs = _context.JobOffers.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(query.Location))
+        {
+            var location = query.Location.ToLower();
+
+            jobs = jobs.Where(j =>
+                EF.Functions.Like(
+                    j.Location.ToLower(),
+                    $"%{location}%"
+                ));
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Seniority))
+        {
+            var seniority = query.Seniority.ToLower();
+
+            jobs = jobs.Where(j =>
+                EF.Functions.Like(
+                    j.Seniority.ToLower(),
+                    $"%{seniority}%"
+                ));
+        }
+
+        jobs = jobs
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize);
+
+        return jobs
+            .Select(ToDto)
+            .ToList();
+    }
+
 
 
 }
