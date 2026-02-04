@@ -17,7 +17,10 @@ public class CreateJobOfferDto
     [Required]
     public string Requirements { get; set; } = "";
 
+    [Required]
     public string Location { get; set; } = "";
+
+    [Required]
     public string Company { get; set; } = "";
 
 }

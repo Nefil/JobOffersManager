@@ -35,6 +35,7 @@ namespace JobOffersManager.API
 
             app.UseAuthorization();
 
+            app.UseMiddleware<JobOffersManager.API.Middleware.ExceptionHandlingMiddleware>();
 
             app.MapControllers();
 
