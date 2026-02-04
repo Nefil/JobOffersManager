@@ -1,23 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace JobOffersManager.Shared;
 
-namespace JobOffersManager.Shared;
-
-public class CreateJobOfferDto
+public class JobOfferDto
 {
-    [Required]
-    [MinLength(3)]
+    public int Id { get; set; }
     public string Title { get; set; } = "";
-
-    [Required]
     public string Seniority { get; set; } = "";
-
-    [Required]
     public string Description { get; set; } = "";
-
-    [Required]
     public string Requirements { get; set; } = "";
-
     public string Location { get; set; } = "";
     public string Company { get; set; } = "";
-
+    public DateTime Created { get; set; } = DateTime.UtcNow;
 }

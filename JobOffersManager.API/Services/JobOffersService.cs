@@ -32,6 +32,8 @@ public class JobOffersService : IJobOffersService
             Seniority = dto.Seniority,
             Description = dto.Description,
             Requirements = dto.Requirements,
+            Location = dto.Location,
+            Company = dto.Company,
             Created = DateTime.UtcNow
         };
 
@@ -50,6 +52,8 @@ public class JobOffersService : IJobOffersService
         job.Seniority = dto.Seniority;
         job.Description = dto.Description;
         job.Requirements = dto.Requirements;
+        job.Location = dto.Location;
+        job.Company = dto.Company;
 
         _context.SaveChanges();
         return ToDto(job);
@@ -73,6 +77,8 @@ public class JobOffersService : IJobOffersService
             Seniority = job.Seniority,
             Description = job.Description,
             Requirements = job.Requirements,
+            Location = job.Location,
+            Company = job.Company,
             Created = job.Created
         };
 }

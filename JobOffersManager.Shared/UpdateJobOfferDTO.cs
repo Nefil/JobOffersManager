@@ -16,4 +16,7 @@ public class UpdateJobOfferDto
 
     [Required]
     public string Requirements { get; set; } = "";
+    public string Location { get; set; } = "";
+    public string Company { get; set; } = "";
+
 }
