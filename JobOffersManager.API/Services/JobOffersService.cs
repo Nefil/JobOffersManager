@@ -115,7 +115,7 @@ public class JobOffersService : IJobOffersService
         }
     }
 
-    // Get all job offers with filtering and pagination
+    // Get all job offers with filtering, pagination and sort by tittle and created
     public List<JobOfferDto> GetAll(JobOfferQueryDto query)
     {
         var jobs = _context.JobOffers.AsQueryable();
@@ -141,6 +141,25 @@ public class JobOffersService : IJobOffersService
                     $"%{seniority}%"
                 ));
         }
+
+        if (!string.IsNullOrWhiteSpace(query.SortBy))
+        {
+            var isDesc = query.SortOrder?.ToLower() == "desc";
+
+            jobs = query.SortBy.ToLower() switch
+            {
+                "title" => isDesc
+                    ? jobs.OrderByDescending(j => j.Title)
+                    : jobs.OrderBy(j => j.Title),
+
+                "created" => isDesc
+                    ? jobs.OrderByDescending(j => j.Created)
+                    : jobs.OrderBy(j => j.Created),
+
+                _ => jobs.OrderByDescending(j => j.Created)
+            };
+        }
+
 
         jobs = jobs
             .Skip((query.Page - 1) * query.PageSize)
