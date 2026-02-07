@@ -115,31 +115,23 @@ public class JobOffersService : IJobOffersService
         }
     }
 
-    // Get all job offers with filtering, pagination and sort by tittle and created
-    public List<JobOfferDto> GetAll(JobOfferQueryDto query)
+    // Get job offers with filtering, sorting, and pagination
+    public JobOffersResponseDto GetAll(JobOfferQueryDto query)
     {
         var jobs = _context.JobOffers.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(query.Location))
         {
             var location = query.Location.ToLower();
-
             jobs = jobs.Where(j =>
-                EF.Functions.Like(
-                    j.Location.ToLower(),
-                    $"%{location}%"
-                ));
+                EF.Functions.Like(j.Location.ToLower(), $"%{location}%"));
         }
 
         if (!string.IsNullOrWhiteSpace(query.Seniority))
         {
             var seniority = query.Seniority.ToLower();
-
             jobs = jobs.Where(j =>
-                EF.Functions.Like(
-                    j.Seniority.ToLower(),
-                    $"%{seniority}%"
-                ));
+                EF.Functions.Like(j.Seniority.ToLower(), $"%{seniority}%"));
         }
 
         if (!string.IsNullOrWhiteSpace(query.SortBy))
@@ -160,16 +152,18 @@ public class JobOffersService : IJobOffersService
             };
         }
 
+        var totalCount = jobs.Count();
 
-        jobs = jobs
+        var items = jobs
             .Skip((query.Page - 1) * query.PageSize)
-            .Take(query.PageSize);
-
-        return jobs
+            .Take(query.PageSize)
             .Select(ToDto)
             .ToList();
+
+        return new JobOffersResponseDto
+        {
+            Items = items, //List of job offers for the current page
+            TotalCount = totalCount
+        };
     }
-
-
-
 }
