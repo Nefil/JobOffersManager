@@ -54,7 +54,7 @@ public class JobOffersServiceTests
         var result = service.GetAll(query);
 
         // assert
-        Assert.Equal(2, result.TotalCount);
-        Assert.Equal(2, result.Items.Count);
+        Assert.Equal(2, result.TotalCount); // Total offers in the database
+        Assert.Equal(2, result.Items.Count); // All offers should be returned since PageSize is 10
     }
 }
