@@ -5,7 +5,7 @@ using JobOffersManager.Shared;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace JobOfferManager.Test.Services;
+namespace JobOffersManager.Tests.Services;
 
 public class JobOffersServiceTests
 {
@@ -54,7 +54,67 @@ public class JobOffersServiceTests
         var result = service.GetAll(query);
 
         // assert
-        Assert.Equal(2, result.TotalCount); // Total offers in the database
-        Assert.Equal(2, result.Items.Count); // All offers should be returned since PageSize is 10
+        Assert.Equal(2, result.TotalCount);
+        Assert.Equal(2, result.Items.Count);
+    }
+
+    [Fact]
+    public void GetAll_WithLocationFilter_ShouldReturnOnlyMatchingOffers()
+    {
+        // arrange
+        var service = CreateService();
+        var query = new JobOfferQueryDto
+        {
+            Location = "gli",
+            Page = 1,
+            PageSize = 10
+        };
+
+        // act
+        var result = service.GetAll(query);
+
+        // assert
+        Assert.Single(result.Items);
+        Assert.Equal("Gliwice", result.Items[0].Location);
+    }
+
+    [Fact]
+    public void GetAll_SortedByTitleAscending_ShouldReturnSortedResults()
+    {
+        // arrange
+        var service = CreateService();
+        var query = new JobOfferQueryDto
+        {
+            SortBy = "title",
+            SortOrder = "asc",
+            Page = 1,
+            PageSize = 10
+        };
+
+        // act
+        var result = service.GetAll(query);
+
+        // assert
+        Assert.Equal("Junior .NET", result.Items[0].Title);
+        Assert.Equal("Senior .NET", result.Items[1].Title);
+    }
+
+    [Fact]
+    public void GetAll_WithPagination_ShouldReturnCorrectPage()
+    {
+        // arrange
+        var service = CreateService();
+        var query = new JobOfferQueryDto
+        {
+            Page = 2,
+            PageSize = 1
+        };
+
+        // act
+        var result = service.GetAll(query);
+
+        // assert
+        Assert.Single(result.Items);
+        Assert.Equal(2, result.TotalCount);
     }
 }
