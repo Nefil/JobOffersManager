@@ -58,15 +58,15 @@ public class JobOffersService : IJobOffersService
     // Update existing job offer
     public JobOfferDto? Update(int id, UpdateJobOfferDto dto)
     {
-            ValidateRequiredFields(
-    (dto.Title, "Title"),
-    (dto.Location, "Location"),
-    (dto.Seniority, "Seniority"),
-    (dto.Description, "Description"),
-    (dto.Requirements, "Requirements"));
+        ValidateRequiredFields(
+(dto.Title, "Title"),
+(dto.Location, "Location"),
+(dto.Seniority, "Seniority"),
+(dto.Description, "Description"),
+(dto.Requirements, "Requirements"));
 
 
-    var job = _context.JobOffers.Find(id);
+        var job = _context.JobOffers.Find(id);
         if (job == null) return null;
 
         job.Title = dto.Title;
@@ -118,8 +118,13 @@ public class JobOffersService : IJobOffersService
     // Get job offers with filtering, sorting, and pagination
     public JobOffersResponseDto GetAll(JobOfferQueryDto query)
     {
+        // Basic safety defaults
+        if (query.Page < 1) query.Page = 1;
+        if (query.PageSize < 1) query.PageSize = 10;
+
         var jobs = _context.JobOffers.AsQueryable();
 
+        // Filtering by location
         if (!string.IsNullOrWhiteSpace(query.Location))
         {
             var location = query.Location.ToLower();
@@ -127,6 +132,7 @@ public class JobOffersService : IJobOffersService
                 EF.Functions.Like(j.Location.ToLower(), $"%{location}%"));
         }
 
+        // Filtering by seniority
         if (!string.IsNullOrWhiteSpace(query.Seniority))
         {
             var seniority = query.Seniority.ToLower();
@@ -134,6 +140,7 @@ public class JobOffersService : IJobOffersService
                 EF.Functions.Like(j.Seniority.ToLower(), $"%{seniority}%"));
         }
 
+        // Sorting
         if (!string.IsNullOrWhiteSpace(query.SortBy))
         {
             var isDesc = query.SortOrder?.ToLower() == "desc";
@@ -152,18 +159,24 @@ public class JobOffersService : IJobOffersService
             };
         }
 
+        // Total count BEFORE pagination
         var totalCount = jobs.Count();
 
+        // Pagination
         var items = jobs
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .Select(ToDto)
             .ToList();
 
+        // Final response
         return new JobOffersResponseDto
         {
-            Items = items, //List of job offers for the current page
-            TotalCount = totalCount
+            Items = items,
+            TotalCount = totalCount,
+            Page = query.Page,
+            PageSize = query.PageSize
         };
     }
 }
+
