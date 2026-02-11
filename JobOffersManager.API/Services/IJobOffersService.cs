@@ -4,7 +4,6 @@ namespace JobOffersManager.API.Services;
 
 public interface IJobOffersService
 {
-    List<JobOfferDto> GetAll();
     JobOffersResponseDto GetAll(JobOfferQueryDto query);
     JobOfferDto? GetById(int id);
     JobOfferDto Create(CreateJobOfferDto dto);

@@ -14,12 +14,6 @@ public class JobOffersService : IJobOffersService
         _context = context;
     }
 
-    // Get all job offers
-    public List<JobOfferDto> GetAll()
-        => _context.JobOffers
-            .Select(j => ToDto(j))
-            .ToList();
-
     // Get job offer by id
     public JobOfferDto? GetById(int id)
     {
