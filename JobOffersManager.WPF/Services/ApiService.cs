@@ -16,11 +16,23 @@ public class ApiService
         };
     }
 
-    public async Task<JobOffersResponseDto?> GetJobsAsync(int page = 1, int pageSize = 10)
+    public async Task<JobOffersResponseDto?> GetJobsAsync(
+        int page = 1,
+        int pageSize = 5,
+        string? location = null,
+        string? seniority = null)
     {
-        return await _httpClient.GetFromJsonAsync<JobOffersResponseDto>(
-            $"api/jobs?page={page}&pageSize={pageSize}");
+        var url = $"api/jobs?page={page}&pageSize={pageSize}";
+
+        if (!string.IsNullOrWhiteSpace(location))
+            url += $"&location={Uri.EscapeDataString(location)}";
+
+        if (!string.IsNullOrWhiteSpace(seniority))
+            url += $"&seniority={Uri.EscapeDataString(seniority)}";
+
+        return await _httpClient.GetFromJsonAsync<JobOffersResponseDto>(url);
     }
+
 
     public async Task<JobOfferDto?> CreateJobAsync(CreateJobOfferDto dto)
     {

@@ -12,8 +12,4 @@
     <ProjectReference Include="..\JobOffersManager.Shared\JobOffersManager.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\" />
-  </ItemGroup>
-
 </Project>

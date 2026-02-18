@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace JobOffersManager.WPF.ViewModels;
+namespace JobOffersManager.WPF.Helpers;
 
 public class RelayCommand : ICommand
 {

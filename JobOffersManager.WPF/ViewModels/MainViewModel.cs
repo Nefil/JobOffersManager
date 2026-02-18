@@ -20,6 +20,8 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand EditCommand { get; }
     public ICommand NextPageCommand { get; }
     public ICommand PreviousPageCommand { get; }
+    public ICommand SearchCommand { get; }
+
 
 
 
@@ -36,6 +38,29 @@ public class MainViewModel : INotifyPropertyChanged
             }
         }
     }
+
+    private string? _filterLocation;
+    public string? FilterLocation
+    {
+        get => _filterLocation;
+        set
+        {
+            _filterLocation = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private string? _filterSeniority;
+    public string? FilterSeniority
+    {
+        get => _filterSeniority;
+        set
+        {
+            _filterSeniority = value;
+            OnPropertyChanged();
+        }
+    }
+
 
     private int _currentPage = 1;
     public int CurrentPage
@@ -78,6 +103,12 @@ public class MainViewModel : INotifyPropertyChanged
             _ => SelectedJob != null);
         NextPageCommand = new RelayCommand(async _ => await NextPage());
         PreviousPageCommand = new RelayCommand(async _ => await PreviousPage());
+        SearchCommand = new RelayCommand(async _ =>
+        {
+            CurrentPage = 1;
+            await LoadJobs();
+        });
+
 
     }
 
@@ -85,7 +116,12 @@ public class MainViewModel : INotifyPropertyChanged
     {
         try
         {
-            var result = await _apiService.GetJobsAsync(CurrentPage, PageSize);
+            var result = await _apiService.GetJobsAsync(
+                CurrentPage,
+                PageSize,
+                FilterLocation,
+                FilterSeniority);
+
 
             if (result != null)
             {
