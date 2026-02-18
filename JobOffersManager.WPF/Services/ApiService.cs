@@ -38,4 +38,15 @@ public class ApiService
         return response.IsSuccessStatusCode;
     }
 
+    public async Task<JobOfferDto?> UpdateJobAsync(int id, UpdateJobOfferDto dto)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/jobs/{id}", dto);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<JobOfferDto>();
+    }
+
+
 }

@@ -14,6 +14,8 @@ public class MainViewModel
     public ICommand LoadCommand { get; }
     public ICommand AddCommand { get; }
     public ICommand DeleteCommand { get; }
+    public ICommand EditCommand { get; }
+
 
     private JobOfferDto? _selectedJob;
     public JobOfferDto? SelectedJob
@@ -29,6 +31,9 @@ public class MainViewModel
         LoadCommand = new RelayCommand(async _ => await LoadJobs());
         AddCommand = new RelayCommand(async _ => await AddJob());
         DeleteCommand = new RelayCommand(async _ => await DeleteJob());
+        EditCommand = new RelayCommand(async _ => await EditJob());
+
+
     }
 
     private async Task LoadJobs()
@@ -44,23 +49,19 @@ public class MainViewModel
 
     private async Task AddJob()
     {
-        var newJob = new CreateJobOfferDto
-        {
-            Title = "New Job",
-            Location = "Test City",
-            Seniority = "Junior",
-            Description = "Test description",
-            Requirements = "Test requirements",
-            Company = "Test Company"
-        };
+        var window = new AddEditJobWindow();
 
-        var created = await _apiService.CreateJobAsync(newJob);
-
-        if (created != null)
+        if (window.ShowDialog() == true)
         {
-            Jobs.Add(created);
+            var created = await _apiService.CreateJobAsync(window.CreateDto);
+
+            if (created != null)
+            {
+                Jobs.Add(created);
+            }
         }
     }
+
 
     private async Task DeleteJob()
     {
@@ -74,4 +75,28 @@ public class MainViewModel
             Jobs.Remove(SelectedJob);
         }
     }
+
+    private async Task EditJob()
+    {
+        if (SelectedJob == null)
+            return;
+
+        var window = new AddEditJobWindow(SelectedJob);
+
+        if (window.ShowDialog() == true)
+        {
+            var updated = await _apiService.UpdateJobAsync(
+                SelectedJob.Id,
+                window.UpdateDto);
+
+            if (updated != null)
+            {
+                // Aktualizacja w kolekcji
+                var index = Jobs.IndexOf(SelectedJob);
+                Jobs[index] = updated;
+            }
+        }
+    }
+
+
 }
