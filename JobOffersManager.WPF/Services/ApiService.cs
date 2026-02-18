@@ -21,4 +21,21 @@ public class ApiService
         return await _httpClient.GetFromJsonAsync<JobOffersResponseDto>(
             $"api/jobs?page={page}&pageSize={pageSize}");
     }
+
+    public async Task<JobOfferDto?> CreateJobAsync(CreateJobOfferDto dto)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/jobs", dto);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<JobOfferDto>();
+    }
+
+    public async Task<bool> DeleteJobAsync(int id)
+    {
+        var response = await _httpClient.DeleteAsync($"api/jobs/{id}");
+        return response.IsSuccessStatusCode;
+    }
+
 }
