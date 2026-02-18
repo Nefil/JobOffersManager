@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Job Offers Manager"
-        Height="550"
-        Width="950"
+        Height="600"
+        Width="1000"
         WindowStartupLocation="CenterScreen">
 
     <DockPanel Margin="15">
@@ -30,7 +30,7 @@
         <DataGrid ItemsSource="{Binding Jobs}"
                   SelectedItem="{Binding SelectedJob, Mode=TwoWay}"
                   AutoGenerateColumns="False"
-                  Margin="0,0,0,15"
+                  Margin="0,0,0,10"
                   IsReadOnly="True"
                   SelectionMode="Single"
                   CanUserAddRows="False"
@@ -56,12 +56,41 @@
                                     Width="150" />
 
                 <DataGridTextColumn Header="Created"
-                                    Binding="{Binding Created, StringFormat='yyyy-MM-dd HH:mm'}"
-                                    Width="160" />
+                                    Binding="{Binding Created, StringFormat=yyyy-MM-dd HH:mm}"
+                                    Width="170" />
 
             </DataGrid.Columns>
 
         </DataGrid>
+
+        <!-- PAGINACJA -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,15">
+
+            <Button Content="Previous"
+                    Width="100"
+                    Margin="0,0,10,0"
+                    Command="{Binding PreviousPageCommand}" />
+
+            <TextBlock Text="{Binding CurrentPage}"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center" />
+
+            <TextBlock Text=" / "
+                       VerticalAlignment="Center"
+                       Margin="5,0" />
+
+            <TextBlock Text="{Binding TotalPages}"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center" />
+
+            <Button Content="Next"
+                    Width="100"
+                    Margin="10,0,0,0"
+                    Command="{Binding NextPageCommand}" />
+
+        </StackPanel>
 
         <!-- Dolne przyciski -->
         <StackPanel DockPanel.Dock="Bottom"
