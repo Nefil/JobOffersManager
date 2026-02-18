@@ -38,6 +38,47 @@ public partial class AddEditJobWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
+        if (IsEditMode)
+        {
+            if (string.IsNullOrWhiteSpace(UpdateDto.Title))
+            {
+                MessageBox.Show("Title is required");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(UpdateDto.Location))
+            {
+                MessageBox.Show("Location is required");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(UpdateDto.Seniority))
+            {
+                MessageBox.Show("Seniority is required");
+                return;
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(CreateDto.Title))
+            {
+                MessageBox.Show("Title is required");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CreateDto.Location))
+            {
+                MessageBox.Show("Location is required");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CreateDto.Seniority))
+            {
+                MessageBox.Show("Seniority is required");
+                return;
+            }
+        }
+
         DialogResult = true;
         Close();
     }

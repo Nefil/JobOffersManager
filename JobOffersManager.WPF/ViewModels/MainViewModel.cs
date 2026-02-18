@@ -1,11 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
-using JobOffersManager.Shared;
+﻿using JobOffersManager.Shared;
 using JobOffersManager.WPF.Services;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Input;
 
 namespace JobOffersManager.WPF.ViewModels;
 
-public class MainViewModel
+public class MainViewModel : INotifyPropertyChanged
 {
     private readonly ApiService _apiService;
 
@@ -21,8 +24,16 @@ public class MainViewModel
     public JobOfferDto? SelectedJob
     {
         get => _selectedJob;
-        set => _selectedJob = value;
+        set
+        {
+            if (_selectedJob != value)
+            {
+                _selectedJob = value;
+                OnPropertyChanged();
+            }
+        }
     }
+
 
     public MainViewModel()
     {
@@ -30,51 +41,74 @@ public class MainViewModel
 
         LoadCommand = new RelayCommand(async _ => await LoadJobs());
         AddCommand = new RelayCommand(async _ => await AddJob());
-        DeleteCommand = new RelayCommand(async _ => await DeleteJob());
-        EditCommand = new RelayCommand(async _ => await EditJob());
+        DeleteCommand = new RelayCommand(
+            async _ => await DeleteJob(SelectedJob),
+            _ => SelectedJob != null);
 
-
+        EditCommand = new RelayCommand(
+            async _ => await EditJob(),
+            _ => SelectedJob != null);
     }
 
     private async Task LoadJobs()
     {
-        var result = await _apiService.GetJobsAsync();
-        if (result != null)
+        try
         {
-            Jobs.Clear();
-            foreach (var job in result.Items)
-                Jobs.Add(job);
+            var result = await _apiService.GetJobsAsync();
+            if (result != null)
+            {
+                Jobs.Clear();
+                foreach (var job in result.Items)
+                    Jobs.Add(job);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading jobs: {ex.Message}");
         }
     }
+
 
     private async Task AddJob()
     {
-        var window = new AddEditJobWindow();
-
-        if (window.ShowDialog() == true)
+        try
         {
+            var window = new AddEditJobWindow();
+            if (window.ShowDialog() != true)
+                return;
+
             var created = await _apiService.CreateJobAsync(window.CreateDto);
 
             if (created != null)
-            {
                 Jobs.Add(created);
-            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error: {ex.Message}");
         }
     }
 
 
-    private async Task DeleteJob()
+    private async Task DeleteJob(object? parameter)
     {
-        if (SelectedJob == null)
+        if (parameter is not JobOfferDto job)
             return;
 
-        var success = await _apiService.DeleteJobAsync(SelectedJob.Id);
+        var confirm = MessageBox.Show(
+            $"Are you sure you want to delete '{job.Title}'?",
+            "Confirm delete",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (confirm != MessageBoxResult.Yes)
+            return;
+
+        var success = await _apiService.DeleteJobAsync(job.Id);
 
         if (success)
-        {
-            Jobs.Remove(SelectedJob);
-        }
+            Jobs.Remove(job);
     }
+
 
     private async Task EditJob()
     {
@@ -98,5 +132,10 @@ public class MainViewModel
         }
     }
 
+    public event PropertyChangedEventHandler? PropertyChanged;
 
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
