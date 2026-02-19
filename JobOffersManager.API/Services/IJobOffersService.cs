@@ -4,9 +4,9 @@ namespace JobOffersManager.API.Services;
 
 public interface IJobOffersService
 {
-    JobOffersResponseDto GetAll(JobOfferQueryDto query);
-    JobOfferDto? GetById(int id);
-    JobOfferDto Create(CreateJobOfferDto dto);
-    JobOfferDto? Update(int id, UpdateJobOfferDto dto);
-    bool Delete(int id);
+    Task<JobOfferDto?> GetByIdAsync(int id);
+    Task<JobOfferDto> CreateAsync(CreateJobOfferDto dto);
+    Task<JobOfferDto?> UpdateAsync(int id, UpdateJobOfferDto dto);
+    Task<bool> DeleteAsync(int id);
+    Task<JobOffersResponseDto> GetAllAsync(JobOfferQueryDto query);
 }

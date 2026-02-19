@@ -15,22 +15,22 @@ public class JobOffersService : IJobOffersService
     }
 
     // Get job offer by id
-    public JobOfferDto? GetById(int id)
+    public async Task<JobOfferDto?> GetByIdAsync(int id)
     {
-        var job = _context.JobOffers.Find(id);
+        var job = await _context.JobOffers.FindAsync(id);
         return job == null ? null : ToDto(job);
     }
 
     // Create new job offer
-    public JobOfferDto Create(CreateJobOfferDto dto)
+    public async Task<JobOfferDto> CreateAsync(CreateJobOfferDto dto)
     {
         ValidateRequiredFields(
-    (dto.Title, "Title"),
-    (dto.Location, "Location"),
-    (dto.Seniority, "Seniority"),
-    (dto.Description, "Description"),
-    (dto.Requirements, "Requirements")
-);
+            (dto.Title, "Title"),
+            (dto.Location, "Location"),
+            (dto.Seniority, "Seniority"),
+            (dto.Description, "Description"),
+            (dto.Requirements, "Requirements")
+        );
 
         var job = new JobOffer
         {
@@ -43,24 +43,24 @@ public class JobOffersService : IJobOffersService
             Created = DateTime.UtcNow
         };
 
-        _context.JobOffers.Add(job);
-        _context.SaveChanges();
+        await _context.JobOffers.AddAsync(job);
+        await _context.SaveChangesAsync();
 
         return ToDto(job);
     }
 
     // Update existing job offer
-    public JobOfferDto? Update(int id, UpdateJobOfferDto dto)
+    public async Task<JobOfferDto?> UpdateAsync(int id, UpdateJobOfferDto dto)
     {
         ValidateRequiredFields(
-(dto.Title, "Title"),
-(dto.Location, "Location"),
-(dto.Seniority, "Seniority"),
-(dto.Description, "Description"),
-(dto.Requirements, "Requirements"));
+            (dto.Title, "Title"),
+            (dto.Location, "Location"),
+            (dto.Seniority, "Seniority"),
+            (dto.Description, "Description"),
+            (dto.Requirements, "Requirements")
+        );
 
-
-        var job = _context.JobOffers.Find(id);
+        var job = await _context.JobOffers.FindAsync(id);
         if (job == null) return null;
 
         job.Title = dto.Title;
@@ -70,18 +70,18 @@ public class JobOffersService : IJobOffersService
         job.Location = dto.Location;
         job.Company = dto.Company;
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return ToDto(job);
     }
 
     // Delete job offer by id
-    public bool Delete(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var job = _context.JobOffers.Find(id);
+        var job = await _context.JobOffers.FindAsync(id);
         if (job == null) return false;
 
         _context.JobOffers.Remove(job);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return true;
     }
 
@@ -110,7 +110,7 @@ public class JobOffersService : IJobOffersService
     }
 
     // Get job offers with filtering, sorting, and pagination
-    public JobOffersResponseDto GetAll(JobOfferQueryDto query)
+    public async Task<JobOffersResponseDto> GetAllAsync(JobOfferQueryDto query)
     {
         // Basic safety defaults
         if (query.Page < 1) query.Page = 1;
@@ -154,14 +154,14 @@ public class JobOffersService : IJobOffersService
         }
 
         // Total count BEFORE pagination
-        var totalCount = jobs.Count();
+        var totalCount = await jobs.CountAsync();
 
         // Pagination
-        var items = jobs
+        var items = await jobs
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
-            .Select(ToDto)
-            .ToList();
+            .Select(j => ToDto(j))
+            .ToListAsync();
 
         // Final response
         return new JobOffersResponseDto

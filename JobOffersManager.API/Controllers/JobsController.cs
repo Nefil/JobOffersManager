@@ -16,30 +16,37 @@ public class JobsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll([FromQuery] JobOfferQueryDto query)
+    public async Task<IActionResult> GetAll([FromQuery] JobOfferQueryDto query)
     {
-        return Ok(_service.GetAll(query));
+        return Ok(await _service.GetAllAsync(query));
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var job = _service.GetById(id);
+        var job = await _service.GetByIdAsync(id);
         return job == null ? NotFound() : Ok(job);
     }
 
     [HttpPost]
-    public IActionResult Create(CreateJobOfferDto dto)
-        => Ok(_service.Create(dto));
+    public async Task<IActionResult> Create(CreateJobOfferDto dto)
+    {
+        return Ok(await _service.CreateAsync(dto));
+    }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, UpdateJobOfferDto dto)
+    public async Task<IActionResult> Update(int id, UpdateJobOfferDto dto)
     {
-        var job = _service.Update(id, dto);
+        var job = await _service.UpdateAsync(id, dto);
         return job == null ? NotFound() : Ok(job);
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
-        => _service.Delete(id) ? NoContent() : NotFound();
+    public async Task<IActionResult> Delete(int id)
+    {
+        return await _service.DeleteAsync(id)
+            ? NoContent()
+            : NotFound();
+    }
 }
+
