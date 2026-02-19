@@ -12,6 +12,8 @@ The project focuses on clean architecture, business validation, data querying, a
 - WPF (MVVM pattern)
 - xUnit
 - Swagger / OpenAPI
+- Asynchronous EF Core operations
+
 
 ## Architecture
 The application follows a layered architecture:
@@ -42,6 +44,7 @@ Backend:
 - Sorting by title and created date
 - Pagination with total count metadata
 - EF Core migrations
+- Asynchronous database operations
 - Unit tests using InMemory database
 
 WPF Client:
