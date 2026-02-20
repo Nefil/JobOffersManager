@@ -1,6 +1,6 @@
 using JobOffersManager.API.Services;
-using JobOffersManager.Shared;
 using JobOffersManager.API.Data;
+using JobOffersManager.API.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobOffersManager.API
@@ -11,20 +11,31 @@ namespace JobOffersManager.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
+            // Controllers
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Swagger
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Services
             builder.Services.AddScoped<IJobOffersService, JobOffersService>();
+
+            // DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite(
+                    builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Ensure database is created
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.EnsureCreated();
+            }
+
+            // Swagger only in development
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -35,7 +46,8 @@ namespace JobOffersManager.API
 
             app.UseAuthorization();
 
-            app.UseMiddleware<JobOffersManager.API.Middleware.ExceptionHandlingMiddleware>();
+            // Global exception handling middleware
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.MapControllers();
 

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using JobOffersManager.WPF.Helpers;
 
 namespace JobOffersManager.WPF.ViewModels;
 
@@ -21,9 +22,6 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand NextPageCommand { get; }
     public ICommand PreviousPageCommand { get; }
     public ICommand SearchCommand { get; }
-
-
-
 
     private JobOfferDto? _selectedJob;
     public JobOfferDto? SelectedJob
@@ -61,7 +59,6 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-
     private int _currentPage = 1;
     public int CurrentPage
     {
@@ -86,8 +83,6 @@ public class MainViewModel : INotifyPropertyChanged
 
     private const int PageSize = 5;
 
-
-
     public MainViewModel()
     {
         _apiService = new ApiService();
@@ -108,8 +103,6 @@ public class MainViewModel : INotifyPropertyChanged
             CurrentPage = 1;
             await LoadJobs();
         });
-
-
     }
 
     private async Task LoadJobs()
@@ -121,7 +114,6 @@ public class MainViewModel : INotifyPropertyChanged
                 PageSize,
                 FilterLocation,
                 FilterSeniority);
-
 
             if (result != null)
             {
@@ -139,27 +131,33 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-
-
     private async Task AddJob()
     {
         try
         {
             var window = new AddEditJobWindow();
-            if (window.ShowDialog() != true)
-                return;
 
-            var created = await _apiService.CreateJobAsync(window.CreateDto);
+            if (window.ShowDialog() == true)
+            {
+                var created = await _apiService.CreateJobAsync(window.CreateDto);
 
-            if (created != null)
-                Jobs.Add(created);
+                if (created != null)
+                {
+                    await LoadJobs(); // Refresh list
+                    MessageBox.Show("Job added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to add job. Check if API is running on https://localhost:7101\n\nDetails in Output window (View > Output)", 
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error: {ex.Message}");
+            MessageBox.Show($"Error adding job: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-
 
     private async Task DeleteJob(object? parameter)
     {
@@ -181,7 +179,6 @@ public class MainViewModel : INotifyPropertyChanged
             Jobs.Remove(job);
     }
 
-
     private async Task EditJob()
     {
         if (SelectedJob == null)
@@ -197,7 +194,7 @@ public class MainViewModel : INotifyPropertyChanged
 
             if (updated != null)
             {
-                // Aktualizacja w kolekcji
+                // Update in collection
                 var index = Jobs.IndexOf(SelectedJob);
                 Jobs[index] = updated;
             }
@@ -221,7 +218,6 @@ public class MainViewModel : INotifyPropertyChanged
             await LoadJobs();
         }
     }
-
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
