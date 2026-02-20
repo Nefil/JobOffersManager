@@ -89,13 +89,8 @@ public class MainViewModel : INotifyPropertyChanged
 
         LoadCommand = new RelayCommand(async _ => await LoadJobs());
         AddCommand = new RelayCommand(async _ => await AddJob());
-        DeleteCommand = new RelayCommand(
-            async _ => await DeleteJob(SelectedJob),
-            _ => SelectedJob != null);
-
-        EditCommand = new RelayCommand(
-            async _ => await EditJob(),
-            _ => SelectedJob != null);
+        DeleteCommand = new RelayCommand(async _ => await DeleteJob(SelectedJob));
+        EditCommand = new RelayCommand(async _ => await EditJob());
         NextPageCommand = new RelayCommand(async _ => await NextPage());
         PreviousPageCommand = new RelayCommand(async _ => await PreviousPage());
         SearchCommand = new RelayCommand(async _ =>
