@@ -27,10 +27,18 @@ namespace JobOffersManager.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -42,9 +50,15 @@ namespace JobOffersManager.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal?>("Salary")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Seniority")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("Telephone")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .IsRequired()

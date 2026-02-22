@@ -5,6 +5,10 @@ public class JobOffer
     public int Id { get; set; }
 
     public string Title { get; set; } = "";
+    public string Email { get; set; } = "";
+    public int? Salary { get; set; }
+    public string Country { get; set; } = "";
+    public int? Telephone { get; set; }
     public string Seniority { get; set; } = "";
     public string Description { get; set; } = "";
     public string Requirements { get; set; } = "";

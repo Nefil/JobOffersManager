@@ -10,6 +10,16 @@ public class CreateJobOfferDto
 
     [Required]
     public string Seniority { get; set; } = "";
+    [Required]
+    public string Email { get; set; } = "";
+    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Salary must be greater than 0")]
+    public int? Salary { get; set; }
+    [Required]
+    public string Country { get; set; } = "";
+    [Required]
+    [Range(100000000, 999999999, ErrorMessage = "Telephone must be a valid 9-digit number")]
+    public int? Telephone { get; set; }
 
     [Required]
     public string Description { get; set; } = "";
@@ -22,5 +32,4 @@ public class CreateJobOfferDto
 
     [Required]
     public string Company { get; set; } = "";
-
 }

@@ -26,15 +26,28 @@ public class JobOffersService : IJobOffersService
     {
         ValidateRequiredFields(
             (dto.Title, "Title"),
+            (dto.Email, "Email"),
+            (dto.Country, "Country"),
             (dto.Location, "Location"),
             (dto.Seniority, "Seniority"),
             (dto.Description, "Description"),
-            (dto.Requirements, "Requirements")
+            (dto.Requirements, "Requirements"),
+            (dto.Company, "Company")
         );
+
+        if (!dto.Salary.HasValue || dto.Salary <= 0)
+            throw new ArgumentException("Salary is required and must be greater than 0");
+
+        if (!dto.Telephone.HasValue)
+            throw new ArgumentException("Telephone is required");
 
         var job = new JobOffer
         {
             Title = dto.Title,
+            Email = dto.Email,
+            Salary = dto.Salary,
+            Country = dto.Country,
+            Telephone = dto.Telephone,
             Seniority = dto.Seniority,
             Description = dto.Description,
             Requirements = dto.Requirements,
@@ -54,16 +67,29 @@ public class JobOffersService : IJobOffersService
     {
         ValidateRequiredFields(
             (dto.Title, "Title"),
+            (dto.Email, "Email"),
+            (dto.Country, "Country"),
             (dto.Location, "Location"),
             (dto.Seniority, "Seniority"),
             (dto.Description, "Description"),
-            (dto.Requirements, "Requirements")
+            (dto.Requirements, "Requirements"),
+            (dto.Company, "Company")
         );
+
+        if (!dto.Salary.HasValue || dto.Salary <= 0)
+            throw new ArgumentException("Salary is required and must be greater than 0");
+
+        if (!dto.Telephone.HasValue)
+            throw new ArgumentException("Telephone is required");
 
         var job = await _context.JobOffers.FindAsync(id);
         if (job == null) return null;
 
         job.Title = dto.Title;
+        job.Email = dto.Email;
+        job.Salary = dto.Salary;
+        job.Country = dto.Country;
+        job.Telephone = dto.Telephone;
         job.Seniority = dto.Seniority;
         job.Description = dto.Description;
         job.Requirements = dto.Requirements;
@@ -91,6 +117,10 @@ public class JobOffersService : IJobOffersService
         {
             Id = job.Id,
             Title = job.Title,
+            Email = job.Email,
+            Salary = job.Salary,
+            Country = job.Country,
+            Telephone = job.Telephone,
             Seniority = job.Seniority,
             Description = job.Description,
             Requirements = job.Requirements,

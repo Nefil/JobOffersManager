@@ -26,6 +26,10 @@ public partial class AddEditJobWindow : Window
         UpdateDto = new UpdateJobOfferDto
         {
             Title = existingJob.Title,
+            Email = existingJob.Email,
+            Salary = existingJob.Salary,
+            Country = existingJob.Country,
+            Telephone = existingJob.Telephone,
             Location = existingJob.Location,
             Seniority = existingJob.Seniority,
             Description = existingJob.Description,
@@ -77,6 +81,30 @@ public partial class AddEditJobWindow : Window
                 MessageBox.Show("Requirements is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            if (string.IsNullOrWhiteSpace(UpdateDto.Country))
+            {
+                MessageBox.Show("Country is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(UpdateDto.Email))
+            {
+                MessageBox.Show("Email is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!UpdateDto.Telephone.HasValue || UpdateDto.Telephone < 100000000 || UpdateDto.Telephone > 999999999)
+            {
+                MessageBox.Show("Telephone is required and must be a valid 9-digit number", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!UpdateDto.Salary.HasValue || UpdateDto.Salary <= 0)
+            {
+                MessageBox.Show("Salary is required and must be greater than 0", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
         }
         else
         {
@@ -113,6 +141,30 @@ public partial class AddEditJobWindow : Window
             if (string.IsNullOrWhiteSpace(CreateDto.Requirements))
             {
                 MessageBox.Show("Requirements is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CreateDto.Country))
+            {
+                MessageBox.Show("Country is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CreateDto.Email))
+            {
+                MessageBox.Show("Email is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!CreateDto.Telephone.HasValue || CreateDto.Telephone < 100000000 || CreateDto.Telephone > 999999999)
+            {
+                MessageBox.Show("Telephone is required and must be a valid 9-digit number", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!CreateDto.Salary.HasValue || CreateDto.Salary <= 0)
+            {
+                MessageBox.Show("Salary is required and must be greater than 0", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
         }

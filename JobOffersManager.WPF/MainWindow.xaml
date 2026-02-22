@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:conv="clr-namespace:JobOffersManager.WPF.Converters"
         Title="Job Offers Manager"
-        Height="650"
-        Width="1050"
+        Height="700"
+        Width="1250"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -128,21 +128,37 @@
                                     Width="*"
                                     MinWidth="180" />
 
+                <DataGridTextColumn Header="Country"
+                                    Binding="{Binding Country}"
+                                    Width="100" />
+
                 <DataGridTextColumn Header="Location"
                                     Binding="{Binding Location}"
                                     Width="130" />
 
+                <DataGridTextColumn Header="Email"
+                                    Binding="{Binding Email}"
+                                    Width="150" />
+
+                <DataGridTextColumn Header="Telephone"
+                                    Binding="{Binding Telephone}"
+                                    Width="120" />
+
                 <DataGridTextColumn Header="Seniority"
                                     Binding="{Binding Seniority}"
-                                    Width="130" />
+                                    Width="100" />
+                
+                <DataGridTextColumn Header="Salary (€)"
+                                    Binding="{Binding Salary, StringFormat={}{0} €}"
+                                    Width="120" />
 
                 <DataGridTextColumn Header="Company"
                                     Binding="{Binding Company}"
-                                    Width="170" />
+                                    Width="150" />
 
                 <DataGridTextColumn Header="Created"
                                     Binding="{Binding Created, StringFormat=yyyy-MM-dd HH:mm}"
-                                    Width="180" />
+                                    Width="150" />
 
             </DataGrid.Columns>
 

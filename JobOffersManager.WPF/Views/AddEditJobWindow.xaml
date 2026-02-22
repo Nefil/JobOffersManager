@@ -1,28 +1,40 @@
 ﻿<Window x:Class="JobOffersManager.WPF.AddEditJobWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Job Offer" Height="450" Width="400">
+        Title="Job Offer" Height="650" Width="400">
 
     <ScrollViewer>
         <StackPanel Margin="15">
 
             <TextBlock Text="Title"/>
             <TextBox Text="{Binding Title}" Margin="0,0,0,10"/>
+            
+            <TextBlock Text="Country"/>
+            <TextBox Text="{Binding Country}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Location"/>
             <TextBox Text="{Binding Location}" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Email"/>
+            <TextBox Text="{Binding Email}" Margin="0,0,0,10"/>
+            
+            <TextBlock Text="Telephone Number"/>
+            <TextBox Text="{Binding Telephone}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Seniority"/>
             <TextBox Text="{Binding Seniority}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Company"/>
             <TextBox Text="{Binding Company}" Margin="0,0,0,10"/>
+            
+            <TextBlock Text="Salary (€)"/>
+            <TextBox Text="{Binding Salary}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Description"/>
-            <TextBox Text="{Binding Description}" Height="60" Margin="0,0,0,10"/>
+            <TextBox Text="{Binding Description}" Height="60" Margin="0,0,0,10" TextWrapping="Wrap"/>
 
             <TextBlock Text="Requirements"/>
-            <TextBox Text="{Binding Requirements}" Height="60" Margin="0,0,0,20"/>
+            <TextBox Text="{Binding Requirements}" Height="60" Margin="0,0,0,20" TextWrapping="Wrap"/>
 
             <Button Content="Save"
                     Height="35"
