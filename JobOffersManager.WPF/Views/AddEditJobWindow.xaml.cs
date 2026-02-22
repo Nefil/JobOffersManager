@@ -94,9 +94,9 @@ public partial class AddEditJobWindow : Window
                 return;
             }
 
-            if (!UpdateDto.Telephone.HasValue || UpdateDto.Telephone < 100000000 || UpdateDto.Telephone > 999999999)
+            if (!UpdateDto.Telephone.HasValue || UpdateDto.Telephone <= 0)
             {
-                MessageBox.Show("Telephone is required and must be a valid 9-digit number", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Telephone is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -156,9 +156,9 @@ public partial class AddEditJobWindow : Window
                 return;
             }
 
-            if (!CreateDto.Telephone.HasValue || CreateDto.Telephone < 100000000 || CreateDto.Telephone > 999999999)
+            if (!CreateDto.Telephone.HasValue || CreateDto.Telephone <= 0)
             {
-                MessageBox.Show("Telephone is required and must be a valid 9-digit number", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Telephone is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

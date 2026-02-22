@@ -15,7 +15,6 @@ public class UpdateJobOfferDto
     [Required]
     public string Country { get; set; } = "";
     [Required]
-    [Range(100000000, 999999999, ErrorMessage = "Telephone must be a valid 9-digit number")]
     public int? Telephone { get; set; }
 
     [Required]
