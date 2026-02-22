@@ -13,7 +13,7 @@ public class MainViewModel : INotifyPropertyChanged
 {
     private readonly ApiService _apiService;
 
-    public ObservableCollection<JobOfferDto> Jobs { get; set; } = new();
+    public ObservableCollection<JobOfferDto> Jobs { get; } = new();
 
     public ICommand LoadCommand { get; }
     public ICommand AddCommand { get; }
@@ -22,6 +22,8 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand NextPageCommand { get; }
     public ICommand PreviousPageCommand { get; }
     public ICommand SearchCommand { get; }
+
+    public bool IsAdmin => _apiService.Role == "Admin";
 
     private JobOfferDto? _selectedJob;
     public JobOfferDto? SelectedJob
@@ -33,6 +35,7 @@ public class MainViewModel : INotifyPropertyChanged
             {
                 _selectedJob = value;
                 OnPropertyChanged();
+                RaiseCanExecuteChanged();
             }
         }
     }
@@ -83,21 +86,23 @@ public class MainViewModel : INotifyPropertyChanged
 
     private const int PageSize = 5;
 
-    public MainViewModel()
+    public MainViewModel(ApiService apiService)
     {
-        _apiService = new ApiService();
+        _apiService = apiService;
 
         LoadCommand = new RelayCommand(async _ => await LoadJobs());
-        AddCommand = new RelayCommand(async _ => await AddJob());
-        DeleteCommand = new RelayCommand(async _ => await DeleteJob(SelectedJob));
-        EditCommand = new RelayCommand(async _ => await EditJob());
+        AddCommand = new RelayCommand(async _ => await AddJob(), _ => IsAdmin);
+        DeleteCommand = new RelayCommand(async _ => await DeleteJob(), _ => IsAdmin && SelectedJob != null);
+        EditCommand = new RelayCommand(async _ => await EditJob(), _ => IsAdmin && SelectedJob != null);
         NextPageCommand = new RelayCommand(async _ => await NextPage());
         PreviousPageCommand = new RelayCommand(async _ => await PreviousPage());
-        SearchCommand = new RelayCommand(async _ =>
-        {
-            CurrentPage = 1;
-            await LoadJobs();
-        });
+        SearchCommand = new RelayCommand(async _ => await LoadJobs());
+    }
+
+    private void RaiseCanExecuteChanged()
+    {
+        (DeleteCommand as RelayCommand)?.RaiseCanExecuteChanged();
+        (EditCommand as RelayCommand)?.RaiseCanExecuteChanged();
     }
 
     private async Task LoadJobs()
@@ -110,15 +115,15 @@ public class MainViewModel : INotifyPropertyChanged
                 FilterLocation,
                 FilterSeniority);
 
-            if (result != null)
-            {
-                Jobs.Clear();
+            if (result == null)
+                return;
 
-                foreach (var job in result.Items)
-                    Jobs.Add(job);
+            Jobs.Clear();
 
-                TotalPages = result.TotalPages;
-            }
+            foreach (var job in result.Items)
+                Jobs.Add(job);
+
+            TotalPages = result.TotalPages;
         }
         catch (Exception ex)
         {
@@ -128,90 +133,123 @@ public class MainViewModel : INotifyPropertyChanged
 
     private async Task AddJob()
     {
+        if (!IsAdmin)
+        {
+            MessageBox.Show("You don't have permission to add jobs.");
+            return;
+        }
+
+        var window = new AddEditJobWindow();
+
+        if (window.ShowDialog() != true)
+            return;
+
         try
         {
-            var window = new AddEditJobWindow();
+            var created = await _apiService.CreateJobAsync(window.CreateDto);
 
-            if (window.ShowDialog() == true)
+            if (created == null)
             {
-                var created = await _apiService.CreateJobAsync(window.CreateDto);
-
-                if (created != null)
-                {
-                    await LoadJobs(); // Refresh list
-                    MessageBox.Show("Job added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Failed to add job. Check if API is running on https://localhost:7101\n\nDetails in Output window (View > Output)", 
-                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                MessageBox.Show("Unauthorized. Token may be missing.");
+                return;
             }
+
+            await LoadJobs();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error adding job: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Error adding job: {ex.Message}");
         }
     }
 
-    private async Task DeleteJob(object? parameter)
+    private async Task DeleteJob()
     {
-        if (parameter is not JobOfferDto job)
+        if (!IsAdmin)
+        {
+            MessageBox.Show("You don't have permission to delete jobs.");
             return;
+        }
+
+        if (SelectedJob == null)
+        {
+            MessageBox.Show("Please select a job offer to delete.");
+            return;
+        }
 
         var confirm = MessageBox.Show(
-            $"Are you sure you want to delete '{job.Title}'?",
-            "Confirm delete",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
+            $"Delete '{SelectedJob.Title}'?",
+            "Confirm",
+            MessageBoxButton.YesNo);
 
         if (confirm != MessageBoxResult.Yes)
             return;
 
-        var success = await _apiService.DeleteJobAsync(job.Id);
+        try
+        {
+            var success = await _apiService.DeleteJobAsync(SelectedJob.Id);
 
-        if (success)
-            Jobs.Remove(job);
+            if (!success)
+            {
+                MessageBox.Show("Failed to delete job. Please check your permissions.");
+                return;
+            }
+
+            Jobs.Remove(SelectedJob);
+            SelectedJob = null;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error deleting job: {ex.Message}");
+        }
     }
 
     private async Task EditJob()
     {
-        if (SelectedJob == null)
+        if (!IsAdmin || SelectedJob == null)
             return;
 
         var window = new AddEditJobWindow(SelectedJob);
 
-        if (window.ShowDialog() == true)
+        if (window.ShowDialog() != true)
+            return;
+
+        try
         {
             var updated = await _apiService.UpdateJobAsync(
                 SelectedJob.Id,
                 window.UpdateDto);
 
-            if (updated != null)
+            if (updated == null)
             {
-                // Update in collection
-                var index = Jobs.IndexOf(SelectedJob);
-                Jobs[index] = updated;
+                MessageBox.Show("Unauthorized.");
+                return;
             }
+
+            var index = Jobs.IndexOf(SelectedJob);
+            Jobs[index] = updated;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error updating job: {ex.Message}");
         }
     }
 
     private async Task NextPage()
     {
-        if (CurrentPage < TotalPages)
-        {
-            CurrentPage++;
-            await LoadJobs();
-        }
+        if (CurrentPage >= TotalPages)
+            return;
+
+        CurrentPage++;
+        await LoadJobs();
     }
 
     private async Task PreviousPage()
     {
-        if (CurrentPage > 1)
-        {
-            CurrentPage--;
-            await LoadJobs();
-        }
+        if (CurrentPage <= 1)
+            return;
+
+        CurrentPage--;
+        await LoadJobs();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

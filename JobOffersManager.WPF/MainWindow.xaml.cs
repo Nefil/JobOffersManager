@@ -1,13 +1,14 @@
-﻿using JobOffersManager.WPF.ViewModels;
+﻿using JobOffersManager.WPF.Services;
+using JobOffersManager.WPF.ViewModels;
 using System.Windows;
 
 namespace JobOffersManager.WPF;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(ApiService apiService)
     {
         InitializeComponent();
-        DataContext = new MainViewModel();
+        DataContext = new MainViewModel(apiService);
     }
 }

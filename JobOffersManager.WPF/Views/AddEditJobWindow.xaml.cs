@@ -5,8 +5,8 @@ namespace JobOffersManager.WPF;
 
 public partial class AddEditJobWindow : Window
 {
-    public CreateJobOfferDto CreateDto { get; private set; }
-    public UpdateJobOfferDto UpdateDto { get; private set; }
+    public CreateJobOfferDto CreateDto { get; private set; } = null!;
+    public UpdateJobOfferDto UpdateDto { get; private set; } = null!;
 
     public bool IsEditMode { get; }
 

@@ -1,14 +1,16 @@
 ﻿using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using JobOffersManager.Shared;
-using System.Diagnostics;
 
 namespace JobOffersManager.WPF.Services;
 
-public class ApiService : IDisposable
+public class ApiService
 {
     private readonly HttpClient _httpClient;
-    private bool _disposed;
+
+    public string? Token { get; private set; }
+    public string? Role { get; private set; }
 
     public ApiService()
     {
@@ -18,37 +20,51 @@ public class ApiService : IDisposable
         };
     }
 
+    // LOGIN
+    public async Task<bool> LoginAsync(string username, string password)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/auth/login",
+                new { username, password });
+
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+            if (result == null)
+                return false;
+
+            Token = result.Token;
+            Role = result.Role?.Trim(); 
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", Token);
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public async Task<JobOffersResponseDto?> GetJobsAsync(
         int page = 1,
         int pageSize = 5,
         string? location = null,
         string? seniority = null)
     {
-        try
-        {
-            var url = $"api/jobs?page={page}&pageSize={pageSize}";
+        var url = $"api/jobs?page={page}&pageSize={pageSize}";
 
-            if (!string.IsNullOrWhiteSpace(location))
-                url += $"&location={Uri.EscapeDataString(location)}";
+        if (!string.IsNullOrWhiteSpace(location))
+            url += $"&location={Uri.EscapeDataString(location)}";
 
-            if (!string.IsNullOrWhiteSpace(seniority))
-                url += $"&seniority={Uri.EscapeDataString(seniority)}";
+        if (!string.IsNullOrWhiteSpace(seniority))
+            url += $"&seniority={Uri.EscapeDataString(seniority)}";
 
-            var response = await _httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-
-            return await response.Content.ReadFromJsonAsync<JobOffersResponseDto>();
-        }
-        catch (HttpRequestException ex)
-        {
-            Debug.WriteLine($"HTTP Error in GetJobsAsync: {ex.Message}");
-            return null;
-        }
-        catch (TaskCanceledException ex)
-        {
-            Debug.WriteLine($"Timeout in GetJobsAsync: {ex.Message}");
-            return null;
-        }
+        return await _httpClient.GetFromJsonAsync<JobOffersResponseDto>(url);
     }
 
     public async Task<JobOfferDto?> CreateJobAsync(CreateJobOfferDto dto)
@@ -56,80 +72,40 @@ public class ApiService : IDisposable
         try
         {
             var response = await _httpClient.PostAsJsonAsync("api/jobs", dto);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"API Error ({response.StatusCode}): {errorContent}");
-                return null;
+                throw new Exception($"API Error: {response.StatusCode} - {errorContent}");
             }
 
             return await response.Content.ReadFromJsonAsync<JobOfferDto>();
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex)
         {
-            Debug.WriteLine($"HTTP Error in CreateJobAsync: {ex.Message}");
-            return null;
-        }
-        catch (TaskCanceledException ex)
-        {
-            Debug.WriteLine($"Timeout in CreateJobAsync: {ex.Message}");
-            return null;
+            throw new Exception($"Create job failed: {ex.Message}", ex);
         }
     }
 
     public async Task<bool> DeleteJobAsync(int id)
     {
-        try
-        {
-            var response = await _httpClient.DeleteAsync($"api/jobs/{id}");
-            return response.IsSuccessStatusCode;
-        }
-        catch (HttpRequestException ex)
-        {
-            Debug.WriteLine($"HTTP Error in DeleteJobAsync: {ex.Message}");
-            return false;
-        }
-        catch (TaskCanceledException ex)
-        {
-            Debug.WriteLine($"Timeout in DeleteJobAsync: {ex.Message}");
-            return false;
-        }
+        var response = await _httpClient.DeleteAsync($"api/jobs/{id}");
+        return response.IsSuccessStatusCode;
     }
 
     public async Task<JobOfferDto?> UpdateJobAsync(int id, UpdateJobOfferDto dto)
     {
-        try
-        {
-            var response = await _httpClient.PutAsJsonAsync($"api/jobs/{id}", dto);
+        var response = await _httpClient.PutAsJsonAsync($"api/jobs/{id}", dto);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"API Error ({response.StatusCode}): {errorContent}");
-                return null;
-            }
-
-            return await response.Content.ReadFromJsonAsync<JobOfferDto>();
-        }
-        catch (HttpRequestException ex)
-        {
-            Debug.WriteLine($"HTTP Error in UpdateJobAsync: {ex.Message}");
+        if (!response.IsSuccessStatusCode)
             return null;
-        }
-        catch (TaskCanceledException ex)
-        {
-            Debug.WriteLine($"Timeout in UpdateJobAsync: {ex.Message}");
-            return null;
-        }
-    }
 
-    public void Dispose()
-    {
-        if (_disposed)
-            return;
-
-        _httpClient?.Dispose();
-        _disposed = true;
+        return await response.Content.ReadFromJsonAsync<JobOfferDto>();
     }
+}
+
+public class LoginResponse
+{
+    public string Token { get; set; } = "";
+    public string Role { get; set; } = "";
 }

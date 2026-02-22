@@ -2,6 +2,9 @@ using JobOffersManager.API.Services;
 using JobOffersManager.API.Data;
 using JobOffersManager.API.Middleware;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace JobOffersManager.API
 {
@@ -26,6 +29,29 @@ namespace JobOffersManager.API
                 options.UseSqlite(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // JWT Authentication
+            var key = Encoding.UTF8.GetBytes("SuperSecretKeyForJwtDemo12345678901!");
+            
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateLifetime = true,
+                    RoleClaimType = System.Security.Claims.ClaimTypes.Role
+                };
+            });
+
             var app = builder.Build();
 
             // Ensure database is created
@@ -42,12 +68,14 @@ namespace JobOffersManager.API
                 app.UseSwaggerUI();
             }
 
+            // Global exception handling middleware - PRZED authentication
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
             app.UseHttpsRedirection();
 
+            // Authentication must be BEFORE Authorization
+            app.UseAuthentication();
             app.UseAuthorization();
-
-            // Global exception handling middleware
-            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.MapControllers();
 
