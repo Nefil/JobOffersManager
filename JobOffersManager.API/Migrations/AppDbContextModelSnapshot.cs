@@ -50,8 +50,8 @@ namespace JobOffersManager.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal?>("Salary")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Salary")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Seniority")
                         .IsRequired()

@@ -19,7 +19,7 @@ namespace JobOffersManager.API.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Salary = table.Column<decimal>(type: "TEXT", nullable: true),
+                    Salary = table.Column<int>(type: "INTEGER", nullable: true),
                     Country = table.Column<string>(type: "TEXT", nullable: false),
                     Telephone = table.Column<int>(type: "INTEGER", nullable: true),
                     Seniority = table.Column<string>(type: "TEXT", nullable: false),

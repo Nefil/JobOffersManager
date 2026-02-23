@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobOffersManager.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260222150706_InitialCreate")]
+    [Migration("20260223203653_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -53,8 +53,8 @@ namespace JobOffersManager.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal?>("Salary")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("Salary")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Seniority")
                         .IsRequired()

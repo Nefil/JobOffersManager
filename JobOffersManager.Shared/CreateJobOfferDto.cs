@@ -10,15 +10,21 @@ public class CreateJobOfferDto
 
     [Required]
     public string Seniority { get; set; } = "";
+    
     [Required]
+    [EmailAddress]
     public string Email { get; set; } = "";
+    
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Salary must be greater than 0")]
-    public int? Salary { get; set; }
+    [Range(1, double.MaxValue, ErrorMessage = "Salary must be greater than 0")]
+    public decimal? Salary { get; set; }
+    
     [Required]
     public string Country { get; set; } = "";
+    
     [Required]
-    public int? Telephone { get; set; }
+    [Phone]
+    public string Telephone { get; set; } = "";
 
     [Required]
     public string Description { get; set; } = "";
