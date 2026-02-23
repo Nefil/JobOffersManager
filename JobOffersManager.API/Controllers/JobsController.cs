@@ -2,7 +2,6 @@
 using JobOffersManager.API.Services;
 using JobOffersManager.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 
 namespace JobOffersManager.API.Controllers;
 
@@ -39,11 +38,13 @@ public class JobsController : ControllerBase
     public async Task<IActionResult> Create(CreateJobOfferDto dto)
     {
         var user = User.Identity?.Name;
-        var roles = User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
-                               .Select(c => c.Value);
-        
-        _logger.LogInformation($"Create called by user: {user}, roles: {string.Join(",", roles)}");
-        
+        var roles = User.Claims
+            .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+            .Select(c => c.Value);
+
+        _logger.LogInformation("Create called by user: {User}, roles: {Roles}",
+            user, string.Join(",", roles));
+
         return Ok(await _service.CreateAsync(dto));
     }
 
@@ -52,11 +53,13 @@ public class JobsController : ControllerBase
     public async Task<IActionResult> Update(int id, UpdateJobOfferDto dto)
     {
         var user = User.Identity?.Name;
-        var roles = User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
-                               .Select(c => c.Value);
-        
-        _logger.LogInformation($"Update called by user: {user}, roles: {string.Join(",", roles)}, id: {id}");
-        
+        var roles = User.Claims
+            .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+            .Select(c => c.Value);
+
+        _logger.LogInformation("Update called by user: {User}, roles: {Roles}, id: {Id}",
+            user, string.Join(",", roles), id);
+
         var job = await _service.UpdateAsync(id, dto);
         return job == null ? NotFound() : Ok(job);
     }
@@ -70,4 +73,3 @@ public class JobsController : ControllerBase
             : NotFound();
     }
 }
-

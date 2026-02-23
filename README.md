@@ -72,9 +72,9 @@ Returns a paginated and filtered list of job offers with metadata including tota
 - ✅ Global exception handling
 - ✅ Two-way data binding
 - ✅ Command pattern implementation
+- ✅ Authentication and authorization
 
-### Possible Future Improvements:
-- Authentication and authorization
+### Possible Future Improvements
 - Logging (Serilog)
 - Docker support
 - Cloud deployment (Azure)

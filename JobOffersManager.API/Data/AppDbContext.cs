@@ -1,6 +1,5 @@
 ﻿using JobOffersManager.API.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace JobOffersManager.API.Data;
 

@@ -1,4 +1,4 @@
-﻿using JobOffersManager.Shared;
+﻿namespace JobOffersManager.Shared;
 
 public class JobOffersResponseDto
 {
