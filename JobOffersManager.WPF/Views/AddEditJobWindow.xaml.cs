@@ -44,132 +44,60 @@ public partial class AddEditJobWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        if (IsEditMode)
-        {
-            if (string.IsNullOrWhiteSpace(UpdateDto.Title))
-            {
-                MessageBox.Show("Title is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+        var ok = IsEditMode 
+            ? ValidateForm(UpdateDto.Title, UpdateDto.Location, UpdateDto.Seniority, 
+                          UpdateDto.Company, UpdateDto.Description, UpdateDto.Requirements,
+                          UpdateDto.Country, UpdateDto.Email, UpdateDto.Telephone, UpdateDto.Salary)
+            : ValidateForm(CreateDto.Title, CreateDto.Location, CreateDto.Seniority,
+                          CreateDto.Company, CreateDto.Description, CreateDto.Requirements,
+                          CreateDto.Country, CreateDto.Email, CreateDto.Telephone, CreateDto.Salary);
 
-            if (string.IsNullOrWhiteSpace(UpdateDto.Location))
-            {
-                MessageBox.Show("Location is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(UpdateDto.Seniority))
-            {
-                MessageBox.Show("Seniority is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(UpdateDto.Company))
-            {
-                MessageBox.Show("Company is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(UpdateDto.Description))
-            {
-                MessageBox.Show("Description is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(UpdateDto.Requirements))
-            {
-                MessageBox.Show("Requirements is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(UpdateDto.Country))
-            {
-                MessageBox.Show("Country is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(UpdateDto.Email))
-            {
-                MessageBox.Show("Email is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(UpdateDto.Telephone))
-            {
-                MessageBox.Show("Telephone is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (!UpdateDto.Salary.HasValue || UpdateDto.Salary <= 0)
-            {
-                MessageBox.Show("Salary is required and must be greater than 0", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-        }
-        else
-        {
-            if (string.IsNullOrWhiteSpace(CreateDto.Title))
-            {
-                MessageBox.Show("Title is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(CreateDto.Location))
-            {
-                MessageBox.Show("Location is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(CreateDto.Seniority))
-            {
-                MessageBox.Show("Seniority is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(CreateDto.Company))
-            {
-                MessageBox.Show("Company is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(CreateDto.Description))
-            {
-                MessageBox.Show("Description is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(CreateDto.Requirements))
-            {
-                MessageBox.Show("Requirements is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(CreateDto.Country))
-            {
-                MessageBox.Show("Country is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(CreateDto.Email))
-            {
-                MessageBox.Show("Email is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(CreateDto.Telephone))
-            {
-                MessageBox.Show("Telephone is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (!CreateDto.Salary.HasValue || CreateDto.Salary <= 0)
-            {
-                MessageBox.Show("Salary is required and must be greater than 0", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-        }
+        if (!ok) return;
 
         DialogResult = true;
         Close();
+    }
+
+    private bool ValidateForm(string title, string location, string seniority, 
+                             string company, string description, string requirements,
+                             string country, string email, string telephone, decimal? salary)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            return ShowError("Title is required");
+
+        if (string.IsNullOrWhiteSpace(location))
+            return ShowError("Location is required");
+
+        if (string.IsNullOrWhiteSpace(seniority))
+            return ShowError("Seniority is required");
+
+        if (string.IsNullOrWhiteSpace(company))
+            return ShowError("Company is required");
+
+        if (string.IsNullOrWhiteSpace(description))
+            return ShowError("Description is required");
+
+        if (string.IsNullOrWhiteSpace(requirements))
+            return ShowError("Requirements is required");
+
+        if (string.IsNullOrWhiteSpace(country))
+            return ShowError("Country is required");
+
+        if (string.IsNullOrWhiteSpace(email))
+            return ShowError("Email is required");
+
+        if (string.IsNullOrWhiteSpace(telephone))
+            return ShowError("Telephone is required");
+
+        if (!salary.HasValue || salary <= 0)
+            return ShowError("Salary is required and must be greater than 0");
+
+        return true;
+    }
+
+    private bool ShowError(string message)
+    {
+        MessageBox.Show(message, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        return false;
     }
 }
