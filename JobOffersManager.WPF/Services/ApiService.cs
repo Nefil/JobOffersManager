@@ -1,7 +1,8 @@
-﻿using System.Net.Http;
+﻿using JobOffersManager.Shared;
+using JobOffersManager.WPF.Models;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using JobOffersManager.Shared;
 
 namespace JobOffersManager.WPF.Services;
 
@@ -16,11 +17,10 @@ public class ApiService
     {
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri("http://localhost:5134/")
+            BaseAddress = new Uri("https://localhost:7101/")
         };
     }
 
-    // LOGIN
     public async Task<bool> LoginAsync(string username, string password)
     {
         try
@@ -37,7 +37,7 @@ public class ApiService
                 return false;
 
             Token = result.Token;
-            Role = result.Role?.Trim(); 
+            Role = result.Role?.Trim();
 
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", Token);
@@ -102,10 +102,4 @@ public class ApiService
 
         return await response.Content.ReadFromJsonAsync<JobOfferDto>();
     }
-}
-
-public class LoginResponse
-{
-    public string Token { get; set; } = "";
-    public string Role { get; set; } = "";
 }
