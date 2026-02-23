@@ -94,7 +94,7 @@ public partial class AddEditJobWindow : Window
                 return;
             }
 
-            if (!UpdateDto.Telephone.HasValue || UpdateDto.Telephone <= 0)
+            if (string.IsNullOrWhiteSpace(UpdateDto.Telephone))
             {
                 MessageBox.Show("Telephone is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -156,7 +156,7 @@ public partial class AddEditJobWindow : Window
                 return;
             }
 
-            if (!CreateDto.Telephone.HasValue || CreateDto.Telephone <= 0)
+            if (string.IsNullOrWhiteSpace(CreateDto.Telephone))
             {
                 MessageBox.Show("Telephone is required", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
