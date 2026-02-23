@@ -20,10 +20,15 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDto login)
     {
-        if (login.Username == "admin" && login.Password == "admin")
+        var adminUsername = _configuration["Users:Admin:Username"];
+        var adminPassword = _configuration["Users:Admin:Password"];
+        var userUsername = _configuration["Users:User:Username"];
+        var userPassword = _configuration["Users:User:Password"];
+
+        if (login.Username == adminUsername && login.Password == adminPassword)
             return Ok(GenerateToken(login.Username, "Admin"));
 
-        if (login.Username == "user" && login.Password == "user")
+        if (login.Username == userUsername && login.Password == userPassword)
             return Ok(GenerateToken(login.Username, "User"));
 
         return Unauthorized();

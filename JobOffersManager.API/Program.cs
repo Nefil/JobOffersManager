@@ -32,7 +32,7 @@ namespace JobOffersManager.API
             // JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("Jwt");
             var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
-            
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -40,7 +40,7 @@ namespace JobOffersManager.API
             })
             .AddJwtBearer(options =>
             {
-                options.RequireHttpsMetadata = false;
+                options.RequireHttpsMetadata = true;
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -71,7 +71,7 @@ namespace JobOffersManager.API
                 app.UseSwaggerUI();
             }
 
-            // Global exception handling middleware - PRZED authentication
+            // Global exception handling middleware
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseHttpsRedirection();
