@@ -10,6 +10,13 @@ namespace JobOffersManager.API.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
+    private readonly IConfiguration _configuration;
+
+    public AuthController(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDto login)
     {
@@ -24,8 +31,9 @@ public class AuthController : ControllerBase
 
     private object GenerateToken(string username, string role)
     {
+        var jwtSettings = _configuration.GetSection("Jwt");
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes("SuperSecretKeyForJwtDemo12345678901!"));
+            Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -36,8 +44,10 @@ public class AuthController : ControllerBase
         };
 
         var token = new JwtSecurityToken(
+            issuer: jwtSettings["Issuer"],
+            audience: jwtSettings["Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(2),
+            expires: DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpireMinutes"]!)),
             signingCredentials: creds
         );
 

@@ -139,7 +139,7 @@ public class JobOffersService : IJobOffersService
         }
     }
 
-    // Get job offers with filtering, sorting, and pagination
+    // Get job offers with filtering and pagination
     public async Task<JobOffersResponseDto> GetAllAsync(JobOfferQueryDto query)
     {
         // Basic safety defaults
@@ -164,24 +164,8 @@ public class JobOffersService : IJobOffersService
                 EF.Functions.Like(j.Seniority.ToLower(), $"%{seniority}%"));
         }
 
-        // Sorting
-        if (!string.IsNullOrWhiteSpace(query.SortBy))
-        {
-            var isDesc = query.SortOrder?.ToLower() == "desc";
-
-            jobs = query.SortBy.ToLower() switch
-            {
-                "title" => isDesc
-                    ? jobs.OrderByDescending(j => j.Title)
-                    : jobs.OrderBy(j => j.Title),
-
-                "created" => isDesc
-                    ? jobs.OrderByDescending(j => j.Created)
-                    : jobs.OrderBy(j => j.Created),
-
-                _ => jobs.OrderByDescending(j => j.Created)
-            };
-        }
+        // Default ordering by creation date (newest first)
+        jobs = jobs.OrderByDescending(j => j.Created);
 
         // Total count BEFORE pagination
         var totalCount = await jobs.CountAsync();

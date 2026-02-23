@@ -30,7 +30,8 @@ namespace JobOffersManager.API
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // JWT Authentication
-            var key = Encoding.UTF8.GetBytes("SuperSecretKeyForJwtDemo12345678901!");
+            var jwtSettings = builder.Configuration.GetSection("Jwt");
+            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
             
             builder.Services.AddAuthentication(options =>
             {
@@ -43,9 +44,11 @@ namespace JobOffersManager.API
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidAudience = jwtSettings["Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateLifetime = true,
                     RoleClaimType = System.Security.Claims.ClaimTypes.Role
