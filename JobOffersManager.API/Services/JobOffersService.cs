@@ -32,14 +32,12 @@ public class JobOffersService : IJobOffersService
             (dto.Seniority, "Seniority"),
             (dto.Description, "Description"),
             (dto.Requirements, "Requirements"),
-            (dto.Company, "Company")
+            (dto.Company, "Company"),
+            (dto.Telephone, "Telephone")
         );
 
         if (!dto.Salary.HasValue || dto.Salary <= 0)
             throw new ArgumentException("Salary is required and must be greater than 0");
-
-        if (!dto.Telephone.HasValue || dto.Telephone <= 0)
-            throw new ArgumentException("Telephone is required");
 
         var job = new JobOffer
         {
@@ -73,14 +71,12 @@ public class JobOffersService : IJobOffersService
             (dto.Seniority, "Seniority"),
             (dto.Description, "Description"),
             (dto.Requirements, "Requirements"),
-            (dto.Company, "Company")
+            (dto.Company, "Company"),
+            (dto.Telephone, "Telephone")
         );
 
         if (!dto.Salary.HasValue || dto.Salary <= 0)
             throw new ArgumentException("Salary is required and must be greater than 0");
-
-        if (!dto.Telephone.HasValue || dto.Telephone <= 0)
-            throw new ArgumentException("Telephone is required");
 
         var job = await _context.JobOffers.FindAsync(id);
         if (job == null) return null;
